@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>訪問介護 ハラスメント対応SOS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a4f7a, #2980b9);
+      color: white;
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    header h1 { font-size: 18px; font-weight: bold; }
+    header p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
+    .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+    .tabs {
+      display: flex;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 11px 4px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.2s;
+    }
+    .tab-btn.active { background: #e74c3c; color: white; }
+    .tab-btn:first-child { border-radius: 12px 0 0 12px; }
+    .tab-btn:last-child  { border-radius: 0 12px 12px 0; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .sos-btn-wrapper { text-align: center; margin: 24px 0; }
+    .sos-btn {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: none;
+      background: radial-gradient(circle, #ff4444, #cc0000);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 0 8px rgba(204,0,0,0.2), 0 0 0 16px rgba(204,0,0,0.1), 0 8px 24px rgba(204,0,0,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      margin: 0 auto;
+    }
+    .sos-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 4px rgba(204,0,0,0.2), 0 4px 12px rgba(204,0,0,0.4);
+    }
+    .sos-btn .sos-text { font-size: 36px; font-weight: 900; line-height: 1; }
+    .sos-btn .sos-sub  { font-size: 12px; margin-top: 4px; opacity: 0.9; }
+
+    .sos-sent {
+      background: #d4edda; border: 2px solid #28a745;
+      border-radius: 12px; padding: 16px;
+      text-align: center; margin: 16px 0; display: none;
+    }
+    .sos-sent.show { display: block; animation: fadeIn 0.4s ease; }
+    .sos-sent h3 { color: #155724; font-size: 16px; margin-bottom: 8px; }
+    .sos-sent p  { color: #155724; font-size: 13px; }
+
+    .contacts-card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 16px; margin-bottom: 16px;
+    }
+    .contacts-card h2 { font-size: 14px; color: #333; margin-bottom: 12px; }
+    .contact-item {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-name { font-size: 13px; font-weight: bold; color: #333; }
+    .contact-role { font-size: 11px; color: #888; margin-top: 2px; }
+    .call-btn {
+      background: #2ecc71; color: white;
+      border: none; border-radius: 20px;
+      padding: 8px 16px; font-size: 13px;
+      cursor: pointer; font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .call-btn.red { background: #e74c3c; }
+
+    .info-card {
+      border-radius: 12px; padding: 14px; margin-bottom: 16px;
+      background: #fff3cd; border: 1px solid #ffc107;
+    }
+    .info-card h3 { font-size: 13px; color: #856404; margin-bottom: 8px; }
+    .info-card p  { font-size: 12px; color: #664d03; line-height: 1.6; }
+
+    .record-card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px; margin-bottom: 16px;
+    }
+    .record-card h2 { font-size: 15px; color: #333; margin-bottom: 16px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: bold; color: #555; margin-bottom: 6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; border: 1.5px solid #ddd;
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 14px; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline: none; border-color: #2980b9; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+
+    .harassment-types { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .type-checkbox {
+      display: flex; align-items: center; gap: 6px;
+      background: #f8f9fa; border: 1.5px solid #ddd;
+      border-radius: 8px; padding: 8px 10px;
+      cursor: pointer; font-size: 12px;
+      transition: all 0.2s;
+    }
+    .type-checkbox input[type="checkbox"] { width: auto; margin: 0; accent-color: #e74c3c; }
+    .type-checkbox.checked { border-color: #e74c3c; background: #fff0ee; }
+
+    .submit-btn {
+      width: 100%; background: #2980b9; color: white;
+      border: none; border-radius: 10px;
+      padding: 14px; font-size: 16px; font-weight: bold;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .submit-btn:hover { background: #2471a3; }
+    .submit-btn.green { background: #27ae60; }
+    .submit-btn.green:hover { background: #229954; }
+
+    .records-list {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px; margin-bottom: 16px;
+    }
+    .records-list h2 {
+      font-size: 15px; color: #333;
+      margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .records-count {
+      background: #e74c3c; color: white;
+      border-radius: 12px; padding: 2px 8px; font-size: 12px;
+    }
+    .record-item {
+      border: 1px solid #eee; border-radius: 8px;
+      padding: 12px; margin-bottom: 10px; background: #fafafa;
+    }
+    .record-meta {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 6px;
+    }
+    .record-date { font-size: 11px; color: #888; }
+    .record-content { font-size: 13px; color: #333; line-height: 1.5; }
+    .record-types { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .type-tag {
+      background: #fff0ee; color: #c0392b;
+      border: 1px solid #fcc;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    .empty-records { text-align: center; color: #aaa; font-size: 14px; padding: 20px 0; }
+    .del-btn {
+      background: none; border: 1px solid #ddd;
+      border-radius: 6px; padding: 3px 8px;
+      font-size: 11px; color: #aaa; cursor: pointer;
+    }
+    .del-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+
+    .settings-card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px; margin-bottom: 16px;
+    }
+    .settings-card h2 { font-size: 15px; color: #333; margin-bottom: 6px; }
+    .settings-card .desc { font-size: 12px; color: #888; margin-bottom: 16px; }
+    .settings-saved {
+      background: #d4edda; border: 1px solid #28a745;
+      border-radius: 8px; padding: 10px;
+      text-align: center; font-size: 13px; color: #155724;
+      margin-top: 12px; display: none;
+    }
+
+    #sos-call-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 999;
+      align-items: center; justify-content: center;
+    }
+    .modal-box {
+      background: white; border-radius: 16px;
+      padding: 24px; width: 300px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 { font-size: 17px; margin-bottom: 6px; color: #c0392b; }
+    .modal-box p  { font-size: 12px; color: #888; margin-bottom: 20px; }
+    .modal-call-btn {
+      display: block; background: #e74c3c; color: white;
+      border-radius: 10px; padding: 14px; font-size: 15px;
+      font-weight: bold; text-decoration: none;
+      margin-bottom: 10px;
+    }
+    .modal-cancel {
+      background: none; border: 1px solid #ddd;
+      border-radius: 8px; padding: 10px 24px;
+      font-size: 14px; color: #888; cursor: pointer;
+    }
+
+    .toast {
+      position: fixed; bottom: 24px;
+      left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #333; color: white;
+      padding: 12px 24px; border-radius: 24px;
+      font-size: 14px; transition: transform 0.3s ease;
+      z-index: 1000; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .settings-note { font-size: 12px; color: #888; text-align: center; margin-top: 8px; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🆘 訪問介護 ハラスメント対応SOS</h1>
+  <p id="header-office-name">あなたの安全を守るためのSOS・記録ツール</p>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('sos', this)">🆘 緊急SOS</button>
+    <button class="tab-btn" onclick="switchTab('record', this)">📝 記録</button>
+    <button class="tab-btn" onclick="switchTab('history', this)">📋 一覧</button>
+    <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ 設定</button>
+  </div>
+
+  <!-- SOS タブ -->
+  <div id="tab-sos" class="tab-panel active">
+
+    <div class="info-card">
+      <h3>⚠️ ハラスメントを受けたら</h3>
+      <p>無理に一人で対応しないでください。すぐにSOSボタンを押して助けを求めましょう。あなたを守ることが最優先です。</p>
+    </div>
+
+    <div class="sos-btn-wrapper">
+      <button class="sos-btn" onclick="sendSOS()">
+        <span class="sos-text">SOS</span>
+        <span class="sos-sub">タップして助けを呼ぶ</span>
+      </button>
+    </div>
+
+    <div class="sos-sent" id="sos-sent-msg">
+      <h3>✅ SOSを送信しました</h3>
+      <p id="sos-sent-time"></p>
+      <p style="margin-top:6px;">連絡先に通知しました。落ち着いて待ってください。</p>
+    </div>
+
+    <div class="contacts-card">
+      <h2>📞 緊急連絡先</h2>
+      <div id="contact-list-sos"></div>
+      <div class="contact-item">
+        <div>
+          <div class="contact-name">労働局 総合労働相談コーナー</div>
+          <div class="contact-role">0120-811-610（無料）</div>
+        </div>
+        <a class="call-btn" href="tel:0120811610">📞 発信</a>
+      </div>
+      <div class="contact-item">
+        <div>
+          <div class="contact-name">警察（緊急）</div>
+          <div class="contact-role">身の危険を感じたらすぐに</div>
+        </div>
+        <a class="call-btn red" href="tel:110">📞 110</a>
+      </div>
+    </div>
+
+    <div class="info-card" style="background:#e8f4fd; border-color:#2980b9;">
+      <h3>💡 その場ですぐできること</h3>
+      <p>① ハラスメントをはっきり断る（「やめてください」と言う）<br>
+         ② 一人で対応せず、できるだけ早くその場を離れる<br>
+         ③ 詳細をできる限りメモ・記録する<br>
+         ④ 事務所に必ず報告する（一人で抱え込まない）</p>
+    </div>
+
+  </div>
+
+  <!-- 記録 タブ -->
+  <div id="tab-record" class="tab-panel">
+    <div class="record-card">
+      <h2>📝 ハラスメント記録</h2>
+      <div class="form-group">
+        <label>📅 発生日時</label>
+        <input type="datetime-local" id="rec-datetime">
+      </div>
+      <div class="form-group">
+        <label>👤 利用者名（任意）</label>
+        <input type="text" id="rec-user" placeholder="例：山田様宅">
+      </div>
+      <div class="form-group">
+        <label>🏷️ ハラスメントの種類（複数選択可）</label>
+        <div class="harassment-types">
+          <label class="type-checkbox"><input type="checkbox" value="セクシャルハラスメント" onchange="toggleCheck(this)">セクシャル</label>
+          <label class="type-checkbox"><input type="checkbox" value="カスタマーハラスメント" onchange="toggleCheck(this)">カスタマー</label>
+          <label class="type-checkbox"><input type="checkbox" value="パワーハラスメント" onchange="toggleCheck(this)">パワー</label>
+          <label class="type-checkbox"><input type="checkbox" value="暴力・身体的ハラスメント" onchange="toggleCheck(this)">暴力・身体的</label>
+          <label class="type-checkbox"><input type="checkbox" value="暴言・言葉によるハラスメント" onchange="toggleCheck(this)">暴言・言葉的</label>
+          <label class="type-checkbox"><input type="checkbox" value="その他" onchange="toggleCheck(this)">その他</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>📋 具体的な状況・内容</label>
+        <textarea id="rec-detail" placeholder="どのような言動があったか、できるだけ具体的に記録してください。証拠として後から使えます。"></textarea>
+      </div>
+      <div class="form-group">
+        <label>👥 目撃者・同席者（任意）</label>
+        <input type="text" id="rec-witness" placeholder="例：同行のヘルパー○○さん">
+      </div>
+      <div class="form-group">
+        <label>📊 精神的ダメージ（1〜5）</label>
+        <select id="rec-damage">
+          <option value="">選択してください</option>
+          <option value="1">1 - ほとんどなし</option>
+          <option value="2">2 - 少し不快</option>
+          <option value="3">3 - かなり辛い</option>
+          <option value="4">4 - とても辛い</option>
+          <option value="5">5 - 極めて深刻</option>
+        </select>
+      </div>
+      <button class="submit-btn" onclick="saveRecord()">💾 記録を保存する</button>
+    </div>
+  </div>
+
+  <!-- 一覧 タブ -->
+  <div id="tab-history" class="tab-panel">
+    <div class="records-list">
+      <h2>
+        📋 記録一覧
+        <span class="records-count" id="records-count">0件</span>
+      </h2>
+      <div id="records-container">
+        <div class="empty-records">まだ記録がありません</div>
+      </div>
+    </div>
+    <p class="settings-note">※ 記録はこの端末に保存されます。重要な証拠は事務所にも共有してください。</p>
+  </div>
+
+  <!-- 設定 タブ -->
+  <div id="tab-settings" class="tab-panel">
+
+    <div class="settings-card">
+      <h2>🏢 事業所名</h2>
+      <p class="desc">アプリ上部に表示される名前を設定します</p>
+      <div class="form-group">
+        <input type="text" id="set-office-name" placeholder="例：〇〇訪問介護ステーション">
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2>📞 緊急連絡先の設定</h2>
+      <p class="desc">SOSボタンと連絡先一覧に表示される電話番号を設定します。最大4件まで登録できます。</p>
+      <div id="contact-settings"></div>
+      <button class="submit-btn" style="margin-top:8px;" onclick="addContactField()">＋ 連絡先を追加</button>
+    </div>
+
+    <button class="submit-btn green" onclick="saveSettings()">✅ 設定を保存する</button>
+    <div class="settings-saved" id="settings-saved-msg">✅ 設定を保存しました！</div>
+
+    <div class="info-card" style="margin-top:16px;">
+      <h3>💡 設定について</h3>
+      <p>設定はこの端末に保存されます。他のスタッフのスマホでも同じHTMLファイルを開き、それぞれで設定してください。</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- SOS発信選択モーダル -->
+<div id="sos-call-modal">
+  <div class="modal-box">
+    <div style="font-size:36px; margin-bottom:8px;">📞</div>
+    <h3>どちらに発信しますか？</h3>
+    <p>タップすると電話アプリが起動します</p>
+    <div id="modal-contacts"></div>
+    <button class="modal-cancel" onclick="closeModal()">キャンセル</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function loadSettings() {
+    try {
+      return JSON.parse(localStorage.getItem('sosSettings') || 'null') || {
+        officeName: '',
+        contacts: [
+          { name: '連絡先①', phone: '08050875855' },
+          { name: '連絡先②', phone: '09035733291' }
+        ]
+      };
+    } catch { return { officeName: '', contacts: [] }; }
+  }
+
+  function saveSettings() {
+    const officeName = document.getElementById('set-office-name').value.trim();
+    const contacts = [];
+    document.querySelectorAll('.contact-row').forEach(row => {
+      const name  = row.querySelector('.c-name').value.trim();
+      const phone = row.querySelector('.c-phone').value.trim().replace(/[^0-9]/g, '');
+      if (phone) contacts.push({ name: name || '連絡先', phone });
+    });
+    if (contacts.length === 0) { showToast('⚠️ 連絡先を1件以上入力してください'); return; }
+    localStorage.setItem('sosSettings', JSON.stringify({ officeName, contacts }));
+    applySettings();
+    document.getElementById('settings-saved-msg').style.display = 'block';
+    setTimeout(() => document.getElementById('settings-saved-msg').style.display = 'none', 2500);
+    showToast('✅ 設定を保存しました');
+  }
+
+  function applySettings() {
+    const s = loadSettings();
+    document.getElementById('header-office-name').textContent =
+      s.officeName ? s.officeName : 'あなたの安全を守るためのSOS・記録ツール';
+
+    document.getElementById('contact-list-sos').innerHTML = s.contacts.map(c => `
+      <div class="contact-item">
+        <div>
+          <div class="contact-name">${escHtml(c.name)}</div>
+          <div class="contact-role">${formatPhone(c.phone)}</div>
+        </div>
+        <a class="call-btn" href="tel:${c.phone}">📞 発信</a>
+      </div>
+    `).join('');
+
+    document.getElementById('modal-contacts').innerHTML = s.contacts.map(c => `
+      <a class="modal-call-btn" href="tel:${c.phone}" onclick="closeModal()">
+        📞 ${escHtml(c.name)}　${formatPhone(c.phone)}
+      </a>
+    `).join('');
+  }
+
+  function renderSettingsForm() {
+    const s = loadSettings();
+    document.getElementById('set-office-name').value = s.officeName || '';
+    document.getElementById('contact-settings').innerHTML = '';
+    s.contacts.forEach(c => addContactField(c.name, c.phone));
+  }
+
+  function addContactField(name = '', phone = '') {
+    const container = document.getElementById('contact-settings');
+    if (container.children.length >= 4) { showToast('⚠️ 連絡先は最大4件までです'); return; }
+    const idx = container.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'contact-row';
+    div.style.cssText = 'border:1px solid #eee; border-radius:10px; padding:12px; margin-bottom:12px; background:#fafafa;';
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:13px; font-weight:bold; color:#555;">連絡先 ${idx}</span>
+        <button onclick="this.closest('.contact-row').remove()" style="background:none; border:none; color:#aaa; cursor:pointer; font-size:18px;">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:8px;">
+        <label style="font-size:12px;">名前・役職</label>
+        <input type="text" class="c-name" placeholder="例：事務所（管理者）" value="${escHtml(name)}">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label style="font-size:12px;">電話番号</label>
+        <input type="tel" class="c-phone" placeholder="例：08012345678" value="${escHtml(phone)}">
+      </div>
+    `;
+    container.appendChild(div);
+  }
+
+  function sendSOS() {
+    const now = new Date();
+    document.getElementById('sos-sent-time').textContent = now.toLocaleString('ja-JP') + ' にSOS送信';
+    document.getElementById('sos-sent-msg').classList.add('show');
+    document.getElementById('sos-call-modal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('sos-call-modal').style.display = 'none';
+  }
+
+  function toggleCheck(cb) {
+    cb.parentElement.classList.toggle('checked', cb.checked);
+  }
+
+  function saveRecord() {
+    const datetime = document.getElementById('rec-datetime').value;
+    const detail   = document.getElementById('rec-detail').value.trim();
+    if (!datetime) { showToast('⚠️ 発生日時を入力してください'); return; }
+    if (!detail)   { showToast('⚠️ 具体的な状況を入力してください'); return; }
+    const types = Array.from(document.querySelectorAll('.harassment-types input:checked')).map(cb => cb.value);
+    const record = {
+      id: Date.now(),
+      datetime,
+      user:    document.getElementById('rec-user').value.trim(),
+      types, detail,
+      witness: document.getElementById('rec-witness').value.trim(),
+      damage:  document.getElementById('rec-damage').value
+    };
+    const records = getRecords();
+    records.unshift(record);
+    localStorage.setItem('harassmentRecords', JSON.stringify(records));
+    ['rec-user','rec-detail','rec-witness'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('rec-damage').value = '';
+    document.querySelectorAll('.harassment-types input').forEach(cb => {
+      cb.checked = false; cb.parentElement.classList.remove('checked');
+    });
+    const now = new Date();
+    document.getElementById('rec-datetime').value =
+      new Date(now - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+    showToast('✅ 記録を保存しました');
+  }
+
+  function getRecords() {
+    try { return JSON.parse(localStorage.getItem('harassmentRecords') || '[]'); }
+    catch { return []; }
+  }
+
+  function renderRecords() {
+    const records = getRecords();
+    document.getElementById('records-count').textContent = records.length + '件';
+    const container = document.getElementById('records-container');
+    if (records.length === 0) {
+      container.innerHTML = '<div class="empty-records">まだ記録がありません</div>';
+      return;
+    }
+    container.innerHTML = records.map(r => {
+      const dt = new Date(r.datetime).toLocaleString('ja-JP');
+      return `
+        <div class="record-item">
+          <div class="record-meta">
+            <span class="record-date">📅 ${dt}${r.user ? ' / '+escHtml(r.user) : ''}</span>
+            <button class="del-btn" onclick="deleteRecord(${r.id})">削除</button>
+          </div>
+          ${r.types.length ? '<div class="record-types">'+r.types.map(t=>`<span class="type-tag">${t}</span>`).join('')+'</div>' : ''}
+          <div class="record-content" style="margin-top:8px;">${escHtml(r.detail).replace(/\n/g,'<br>')}</div>
+          ${r.witness ? `<div style="font-size:12px;color:#888;margin-top:4px;">目撃者: ${escHtml(r.witness)}</div>` : ''}
+          ${r.damage  ? `<div style="font-size:12px;color:#888;margin-top:2px;">精神的ダメージ: ${r.damage}/5</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function deleteRecord(id) {
+    if (!confirm('この記録を削除しますか？')) return;
+    localStorage.setItem('harassmentRecords',
+      JSON.stringify(getRecords().filter(r => r.id !== id)));
+    renderRecords();
+    showToast('🗑️ 記録を削除しました');
+  }
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+    if (tab === 'history')  renderRecords();
+    if (tab === 'settings') renderSettingsForm();
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function formatPhone(p) {
+    if (p.length === 11) return p.slice(0,3)+'-'+p.slice(3,7)+'-'+p.slice(7);
+    if (p.length === 10) return p.slice(0,3)+'-'+p.slice(3,6)+'-'+p.slice(6);
+    return p;
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  (function init() {
+    applySettings();
+    const now = new Date();
+    document.getElementById('rec-datetime').value =
+      new Date(now - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  })();
+</script>
+</body>
+</html>
